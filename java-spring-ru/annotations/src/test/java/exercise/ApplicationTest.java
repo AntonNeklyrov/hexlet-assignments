@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ApplicationTest {
 
-    
+
     @Test
     public void testInspect() {
         Application.main(null);

@@ -10,7 +10,7 @@ public class Application {
         // BEGIN
         for (var method : address.getClass().getMethods()) {
             if (method.isAnnotationPresent(Inspect.class)) {
-                System.out.println("Method " + method.getName() + " returns a value of type " + method.getReturnType());
+                System.out.println("Method " + method.getName() + " returns a value of type " + method.getReturnType().getSimpleName());
             }
         }
         // END
