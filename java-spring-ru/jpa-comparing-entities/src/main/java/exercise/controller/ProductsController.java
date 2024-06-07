@@ -31,9 +31,12 @@ public class ProductsController {
         return productRepository.findAll();
     }
 
-    @PostMapping("/products")
+    @PostMapping
+    @ResponseStatus(code = HttpStatus.CREATED)
     public Product createProduct(@RequestBody Product product) {
-        if (productRepository.existsById(product.getId())) {
+        List<Product> products = productRepository.findAll();
+
+        if (products.contains(product)) {
             throw new ResourceAlreadyExistsException();
         }
 
