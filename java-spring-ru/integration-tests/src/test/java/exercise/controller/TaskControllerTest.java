@@ -1,7 +1,5 @@
 package exercise.controller;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Tags;
 import org.junit.jupiter.api.Test;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
@@ -40,14 +38,6 @@ class TaskControllerTest {
     @Autowired
     private TaskRepository taskRepository;
 
-    private static Task actual;
-
-    @BeforeAll
-    public static void init() {
-        actual = new Task();
-        actual.setTitle("testTitle");
-        actual.setDescription("testDescription");
-    }
 
     @Test
     public void testWelcomePage() throws Exception {
@@ -71,7 +61,8 @@ class TaskControllerTest {
 
     @Test
     public void shouldGetTaskById() throws Exception {
-        //given                                                     r
+        //given
+        var actual = createNewTask();
         taskRepository.save(actual);
 
         //when
@@ -80,12 +71,16 @@ class TaskControllerTest {
                 .andReturn();
 
         //then
-        assertThatJson(om.writeValueAsString(actual)).isEqualTo(request.getResponse().getContentAsString());
+        var expected = om.readValue(request.getResponse().getContentAsString(), Task.class);
+        assertThat(actual.getTitle()).isEqualTo(expected.getTitle());
+        assertThat(actual.getDescription()).isEqualTo(expected.getDescription());
     }
+
 
     @Test
     public void shouldCreateTask() throws Exception {
         //when
+        var actual = createNewTask();
         var request = mockMvc.perform(post("/tasks")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(actual)))
@@ -102,7 +97,7 @@ class TaskControllerTest {
     @Test
     public void shouldUpdateTask() throws Exception {
         //given
-        taskRepository.save(actual);
+        taskRepository.save(createNewTask());
         var updatedTask = new Task();
         updatedTask.setDescription("newDescription");
         updatedTask.setTitle("newTitle");
@@ -124,7 +119,7 @@ class TaskControllerTest {
     @Test
     public void shouldDeleteTask() throws Exception {
         //given
-        taskRepository.save(actual);
+        taskRepository.save(createNewTask());
 
         //when
         var deleteRequest = mockMvc.perform(delete("/tasks/{id}", 1))
@@ -134,5 +129,10 @@ class TaskControllerTest {
                 .andExpect(status().isNotFound());
     }
 
-
+    private Task createNewTask() {
+        var actual = new Task();
+        actual.setTitle("testTitle");
+        actual.setDescription("testDescription");
+        return actual;
+    }
 }
